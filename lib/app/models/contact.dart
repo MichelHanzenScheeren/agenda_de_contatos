@@ -1,12 +1,11 @@
 class Contact {
-
   int id;
   String name;
   String email;
   String phone;
   String img;
 
-  Contact(this.name, this.email, this.phone, this.img);
+  Contact();
 
   Contact.fromMap(Map map) {
     id = map["id"];
@@ -23,7 +22,7 @@ class Contact {
       "phone": phone,
       "img": img
     };
-    if(id != null) {
+    if (id != null) {
       map["id"] = id;
     }
     return map;
@@ -33,5 +32,4 @@ class Contact {
   String toString() {
     return "Contact(id: $id, name: $name, email: $email, phone: $phone, img: $img)";
   }
-
 }
