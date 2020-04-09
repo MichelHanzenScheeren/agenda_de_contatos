@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:agendadecontatos/app/homePage/HomePage.dart';
+import 'package:agendadecontatos/app/pages/homePage.dart';
 
 class MyApp extends StatelessWidget {
   @override
