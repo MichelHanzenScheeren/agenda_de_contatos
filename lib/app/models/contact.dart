@@ -6,6 +6,8 @@ class Contact {
   String phone;
   String img;
 
+  Contact(this.name, this.email, this.phone, this.img);
+
   Contact.fromMap(Map map) {
     id = map["id"];
     name = map["name"];
