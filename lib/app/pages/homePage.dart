@@ -1,5 +1,6 @@
 import 'package:agendadecontatos/app/helpers/contactHelper.dart';
 import 'package:agendadecontatos/app/models/contact.dart';
+import 'package:agendadecontatos/app/pages/contactPage.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,12 +15,19 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _getAllContacts();
+  }
 
-    _helper.getAll().then((data) {
-      setState(() {
-        _contacts = data;
-      });
-    });
+  void _getAllContacts() {
+    _helper.getAll().then((data) => setState(() => _contacts = data));
+  }
+
+  Future _editContact(Contact contact) async {
+    await _helper.update(contact);
+  }
+
+  Future _createContact(Contact contact) async {
+    await _helper.save(contact);
   }
 
   @override
@@ -37,7 +45,7 @@ class _HomePageState extends State<HomePage> {
             Icons.add,
             color: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: _showContactPage,
         ),
         body: ListView.builder(
             padding: EdgeInsets.all(10),
@@ -49,6 +57,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildContactList(BuildContext context, int index) {
     return GestureDetector(
+      onTap: () {
+        _showContactPage(ctt: _contacts[index]);
+      },
       child: Card(
         color: Colors.black,
         child: Row(
@@ -64,26 +75,13 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 10),
+              padding: EdgeInsets.only(left: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    _contacts[index].name ?? "Não informado",
-                    style: TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    _contacts[index].email ?? "Não informado",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  Text(
-                    _contacts[index].phone ?? "Não informado",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
+                  _generateText(_contacts[index].name, 20.0),
+                  _generateText(_contacts[index].email, 17.0),
+                  _generateText(_contacts[index].phone, 17.0),
                 ],
               ),
             ),
@@ -91,5 +89,32 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Widget _generateText(String text, double tamanho) {
+    return Text(
+      text != "" ? text : "Email não informado",
+      style: TextStyle(
+        fontSize: tamanho,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  void _showContactPage({Contact ctt}) async {
+    final newContact = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ContactPage(contact: ctt)));
+    if (newContact != null) {
+      await _verifiContacts(ctt, newContact);
+      _getAllContacts();
+    }
+  }
+
+  Future _verifiContacts(Contact ctt, Contact newContact) async {
+    if (ctt != null) {
+      await _editContact(newContact);
+    } else {
+      await _createContact(newContact);
+    }
   }
 }

@@ -14,9 +14,11 @@ class ContactPage extends StatefulWidget {
 
 class _ContactPageState extends State<ContactPage> {
   Contact _editedContact;
+  bool modified = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  GlobalKey<FormState> _keyForm = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -24,8 +26,10 @@ class _ContactPageState extends State<ContactPage> {
     if (widget.contact == null) {
       _editedContact = Contact();
     } else {
-      _editedContact =
-          Contact.fromMap(widget.contact.toMap()); //para criar cópia
+      _editedContact = widget.contact;
+      nameController.text = _editedContact.name;
+      emailController.text = _editedContact.email;
+      phoneController.text = _editedContact.phone;
     }
   }
 
@@ -44,53 +48,70 @@ class _ContactPageState extends State<ContactPage> {
           Icons.save,
           color: Colors.white,
         ),
-        onPressed: () {},
+        onPressed: () {
+          if (_keyForm.currentState.validate()) {
+            _editedContact.name = nameController.text;
+            _editedContact.email = emailController.text;
+            _editedContact.phone = phoneController.text;
+            Navigator.pop(context, _editedContact);
+          }
+        },
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          children: <Widget>[
-            GestureDetector(
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: _editedContact.img != null
-                        ? FileImage(File(_editedContact.img))
-                        : AssetImage("assets/images/contact.png"),
+          padding: EdgeInsets.all(15),
+          child: Form(
+            key: _keyForm,
+            child: Column(
+              children: <Widget>[
+                GestureDetector(
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: _editedContact.img != null
+                            ? FileImage(File(_editedContact.img))
+                            : AssetImage("assets/images/contact.png"),
+                      ),
+                    ),
                   ),
+                  onTap: () {},
                 ),
-              ),
-              onTap: () {},
+                generateTextField(nameController, "Nome", validate: validator),
+                generateTextField(emailController, "Email",
+                    tipo: TextInputType.emailAddress),
+                generateTextField(phoneController, "Telefone",
+                    validate: validator, tipo: TextInputType.phone),
+              ],
             ),
-            generateTextField(nameController, "Nome", TextInputType.text,
-                foco: true),
-            Divider(),
-            generateTextField(
-                emailController, "Email", TextInputType.emailAddress),
-            Divider(),
-            generateTextField(phoneController, "Telefone", TextInputType.phone),
-            Divider(),
-          ],
-        ),
-      ),
+          )),
     );
   }
 
-  Widget generateTextField(
-      TextEditingController controler, String label, TextInputType tipo,
-      {bool foco: false}) {
-    return TextField(
+  Widget generateTextField(TextEditingController controler, String label,
+      {Function validate, TextInputType tipo: TextInputType.text}) {
+    return TextFormField(
       controller: controler,
       keyboardType: tipo,
-      autofocus: foco,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.white, fontSize: 20),
       ),
       style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      onChanged: (text) {
+        if (!modified) {
+          modified = true;
+        }
+      },
+      validator: validate,
     );
+  }
+
+  String validator(String text) {
+    if (text.isEmpty)
+      return "Preenchimento obrigatório!";
+    else
+      return null;
   }
 }
