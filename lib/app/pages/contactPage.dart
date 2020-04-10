@@ -33,31 +33,64 @@ class _ContactPageState extends State<ContactPage> {
     }
   }
 
+  Future<bool> _validatePop() {
+    if (modified) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Descartar Alterações?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text("Confirmar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
-        title: Text(_editedContact.name ?? "Novo Contato"),
-        centerTitle: true,
-      ),
-      backgroundColor: Colors.black,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepOrange,
-        child: Icon(
-          Icons.save,
-          color: Colors.white,
+    return WillPopScope(
+      onWillPop: _validatePop,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.deepOrange,
+          title: Text(_editedContact.name ?? "Novo Contato"),
+          centerTitle: true,
         ),
-        onPressed: () {
-          if (_keyForm.currentState.validate()) {
-            _editedContact.name = nameController.text;
-            _editedContact.email = emailController.text;
-            _editedContact.phone = phoneController.text;
-            Navigator.pop(context, _editedContact);
-          }
-        },
-      ),
-      body: SingleChildScrollView(
+        backgroundColor: Colors.black,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.deepOrange,
+          child: Icon(
+            Icons.save,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            if (_keyForm.currentState.validate()) {
+              _editedContact.name = nameController.text;
+              _editedContact.email = emailController.text;
+              _editedContact.phone = phoneController.text;
+              Navigator.pop(context, _editedContact);
+            }
+          },
+        ),
+        body: SingleChildScrollView(
           padding: EdgeInsets.all(15),
           child: Form(
             key: _keyForm,
@@ -85,7 +118,9 @@ class _ContactPageState extends State<ContactPage> {
                     validate: validator, tipo: TextInputType.phone),
               ],
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 
