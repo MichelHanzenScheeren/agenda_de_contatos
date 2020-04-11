@@ -1,6 +1,7 @@
 import 'package:agendadecontatos/app/helpers/contactHelper.dart';
 import 'package:agendadecontatos/app/models/contact.dart';
 import 'package:agendadecontatos/app/pages/contactPage.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -109,7 +110,10 @@ class _HomePageState extends State<HomePage> {
                   children: <Widget>[
                     FlatButton(
                       child: Icon(Icons.call),
-                      onPressed: () {},
+                      onPressed: () {
+                        launch("tel:${_contacts[index].phone}");
+                        Navigator.pop(context);
+                      },
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 20, right: 20),
