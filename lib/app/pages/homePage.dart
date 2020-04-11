@@ -26,6 +26,10 @@ class _HomePageState extends State<HomePage> {
     await _helper.update(contact);
   }
 
+  Future _deleteContact(int index) async {
+    await _helper.delete(_contacts[index].id);
+  }
+
   Future _createContact(Contact contact) async {
     await _helper.save(contact);
   }
@@ -58,7 +62,7 @@ class _HomePageState extends State<HomePage> {
   Widget buildContactList(BuildContext context, int index) {
     return GestureDetector(
       onTap: () {
-        _showContactPage(ctt: _contacts[index]);
+        _showOptions(context, index);
       },
       child: Card(
         color: Colors.black,
@@ -88,6 +92,78 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showOptions(BuildContext context, int index) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return BottomSheet(
+            builder: (context) {
+              return Container(
+                padding: EdgeInsets.only(top: 5, bottom: 5),
+                color: Colors.deepOrange,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    FlatButton(
+                      child: Icon(Icons.call),
+                      onPressed: () {},
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: FlatButton(
+                        child: Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _showContactPage(ctt: _contacts[index]);
+                        },
+                      ),
+                    ),
+                    FlatButton(
+                      child: Icon(Icons.delete),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _showDeleteDialog(context, index);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+            onClosing: () {},
+          );
+        });
+  }
+
+  void _showDeleteDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Tem certeza que deseja excluir?"),
+          content: Text("Contatos apagados NÃO podem ser recuperados!"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("CANCELAR"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: Text("EXCLUIR"),
+              onPressed: () async {
+                await _deleteContact(index);
+                setState(() {
+                  _contacts.removeAt(index);
+                  Navigator.pop(context);
+                });
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
