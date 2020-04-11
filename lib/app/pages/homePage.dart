@@ -1,10 +1,11 @@
 import 'dart:io';
-
 import 'package:agendadecontatos/app/helpers/contactHelper.dart';
 import 'package:agendadecontatos/app/models/contact.dart';
 import 'package:agendadecontatos/app/pages/contactPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
+
+enum OrderOptions { orderAZ, orderZA }
 
 class HomePage extends StatefulWidget {
   @override
@@ -44,8 +45,22 @@ class _HomePageState extends State<HomePage> {
           title: Text("Contatos"),
           centerTitle: true,
           backgroundColor: Colors.deepOrange,
+          actions: <Widget>[
+            PopupMenuButton<OrderOptions>(
+              itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
+                const PopupMenuItem<OrderOptions>(
+                  child: Text("Ordenar de A-Z"),
+                  value: OrderOptions.orderAZ,
+                ),
+                const PopupMenuItem<OrderOptions>(
+                  child: Text("Ordenar de Z-A"),
+                  value: OrderOptions.orderZA,
+                ),
+              ],
+              onSelected: _orderList,
+            )
+          ],
         ),
-        backgroundColor: Colors.black,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.deepOrange,
           child: Icon(
@@ -62,36 +77,46 @@ class _HomePageState extends State<HomePage> {
             }));
   }
 
+  void _orderList(OrderOptions result) {
+    switch (result) {
+      case OrderOptions.orderAZ:
+        _contacts.sort((a, b) {
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case OrderOptions.orderZA:
+        _contacts.sort((a, b) {
+          return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+        });
+        break;
+    }
+    setState(() {});
+  }
+
   Widget buildContactList(BuildContext context, int index) {
     return GestureDetector(
-      onTap: () {
-        _showOptions(context, index);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(color: Colors.white),
-                top: BorderSide(color: Colors.white))),
-        child: Card(
-          color: Colors.black,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 80.0,
-                  height: 80.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: _contacts[index].img != null
-                          ? FileImage(File(_contacts[index].img))
-                          : AssetImage("assets/images/contact.png"),
-                    ),
+      onTap: () => _showOptions(context, index),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(5, 10, 10, 10),
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 80.0,
+                height: 80.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: _contacts[index].img != null
+                        ? FileImage(File(_contacts[index].img))
+                        : AssetImage("assets/images/contact.png"),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(left: 5),
+              ),
+              Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -101,8 +126,8 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-              ],
-            ),
+              )
+            ],
           ),
         ),
       ),
@@ -122,7 +147,10 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     FlatButton(
-                      child: Icon(Icons.call),
+                      child: Icon(
+                        Icons.call,
+                        color: Colors.white,
+                      ),
                       onPressed: () {
                         launch("tel:${_contacts[index].phone}");
                         Navigator.pop(context);
@@ -131,7 +159,10 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: const EdgeInsets.only(left: 20, right: 20),
                       child: FlatButton(
-                        child: Icon(Icons.edit),
+                        child: Icon(
+                          Icons.edit,
+                          color: Colors.white,
+                        ),
                         onPressed: () {
                           Navigator.pop(context);
                           _showContactPage(ctt: _contacts[index]);
@@ -139,7 +170,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     FlatButton(
-                      child: Icon(Icons.delete),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
                       onPressed: () {
                         Navigator.pop(context);
                         _showDeleteDialog(context, index);
@@ -159,17 +193,27 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Tem certeza que deseja excluir?"),
-          content: Text("Contatos apagados NÃO podem ser recuperados!"),
+          backgroundColor: Colors.deepOrange,
+          title: Text(
+            "Deseja realmente excluir?",
+            style: TextStyle(color: Colors.white),
+          ),
+          content: Text(
+            "Contatos apagados NÃO podem mais ser recuperados!",
+            style: TextStyle(color: Colors.white),
+          ),
           actions: <Widget>[
             FlatButton(
-              child: Text("CANCELAR"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+                child: Text(
+                  "CANCELAR",
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () => Navigator.pop(context)),
             FlatButton(
-              child: Text("EXCLUIR"),
+              child: Text(
+                "EXCLUIR",
+                style: TextStyle(color: Colors.white),
+              ),
               onPressed: () async {
                 await _deleteContact(index);
                 setState(() {
@@ -189,7 +233,6 @@ class _HomePageState extends State<HomePage> {
       text != "" ? text : "Email não informado",
       style: TextStyle(
         fontSize: tamanho,
-        color: Colors.white,
       ),
     );
   }

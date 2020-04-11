@@ -74,7 +74,6 @@ class _ContactPageState extends State<ContactPage> {
           title: Text(_editedContact.name ?? "Novo Contato"),
           centerTitle: true,
         ),
-        backgroundColor: Colors.black,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.deepOrange,
           child: Icon(
@@ -98,11 +97,12 @@ class _ContactPageState extends State<ContactPage> {
               children: <Widget>[
                 GestureDetector(
                   child: Container(
-                    width: 200,
-                    height: 200,
+                    width: 250,
+                    height: 250,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
+                        fit: BoxFit.cover,
                         image: _editedContact.img != null
                             ? FileImage(File(_editedContact.img))
                             : AssetImage("assets/images/contact.png"),
@@ -142,12 +142,11 @@ class _ContactPageState extends State<ContactPage> {
       keyboardType: tipo,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white, fontSize: 20),
+        labelStyle: TextStyle(fontSize: 20),
       ),
       style: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
       ),
       onChanged: (text) {
         if (!modified) {
