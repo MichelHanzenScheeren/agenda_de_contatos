@@ -8,7 +8,6 @@ class MyApp extends StatelessWidget {
       title: "Agenda de Contatos",
       home: HomePage(),
       debugShowCheckedModeBanner: false,
-      darkTheme: ThemeData.dark(),
     );
   }
 }

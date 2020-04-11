@@ -1,6 +1,6 @@
 import 'dart:io';
-
 import 'package:agendadecontatos/app/models/contact.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 class ContactPage extends StatefulWidget {
@@ -98,8 +98,8 @@ class _ContactPageState extends State<ContactPage> {
               children: <Widget>[
                 GestureDetector(
                   child: Container(
-                    width: 150,
-                    height: 150,
+                    width: 200,
+                    height: 200,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
@@ -109,7 +109,18 @@ class _ContactPageState extends State<ContactPage> {
                       ),
                     ),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    ImagePicker.pickImage(source: ImageSource.gallery)
+                        .then((file) {
+                      if (file == null)
+                        return;
+                      else {
+                        setState(() {
+                          _editedContact.img = file.path;
+                        });
+                      }
+                    });
+                  },
                 ),
                 generateTextField(nameController, "Nome", validate: validator),
                 generateTextField(emailController, "Email",
@@ -133,7 +144,11 @@ class _ContactPageState extends State<ContactPage> {
         labelText: label,
         labelStyle: TextStyle(color: Colors.white, fontSize: 20),
       ),
-      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
       onChanged: (text) {
         if (!modified) {
           modified = true;

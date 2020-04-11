@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:agendadecontatos/app/helpers/contactHelper.dart';
 import 'package:agendadecontatos/app/models/contact.dart';
 import 'package:agendadecontatos/app/pages/contactPage.dart';
@@ -53,7 +55,7 @@ class _HomePageState extends State<HomePage> {
           onPressed: _showContactPage,
         ),
         body: ListView.builder(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.fromLTRB(1, 10, 1, 10),
             itemCount: _contacts.length,
             itemBuilder: (context, index) {
               return buildContactList(context, index);
@@ -65,32 +67,43 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         _showOptions(context, index);
       },
-      child: Card(
-        color: Colors.black,
-        child: Row(
-          children: <Widget>[
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage("assets/images/contact.png"),
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border(
+                bottom: BorderSide(color: Colors.white),
+                top: BorderSide(color: Colors.white))),
+        child: Card(
+          color: Colors.black,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: _contacts[index].img != null
+                          ? FileImage(File(_contacts[index].img))
+                          : AssetImage("assets/images/contact.png"),
+                    ),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      _generateText(_contacts[index].name, 20.0),
+                      _generateText(_contacts[index].email, 17.0),
+                      _generateText(_contacts[index].phone, 17.0),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.only(left: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _generateText(_contacts[index].name, 20.0),
-                  _generateText(_contacts[index].email, 17.0),
-                  _generateText(_contacts[index].phone, 17.0),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
